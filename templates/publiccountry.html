@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
+    <title>Countries</title>
+</head>
+<body>
+
+    <h1> Countries  </h1>
+    
+
+    {% for country in countries %} <br>
+    <h2>{{ country.name }}</h2><br>
+    <a href="editcountry.html"> Edit country</a> <br>
+    <a href="deletecountry.html"> Delete country</a> <br><br>
+    
+    {% endfor %}
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Delete Destination</title>
+</head>
+<body>
+    <h1>Are you sure you want to delete destination</h1>
+
+    <form action='{{ url_for('deleteDestination', country_id = country_id, destination_id=destination.id)}}' method = 'post'>
+        <input type="submit" value='Delete'><br><br>
+        
+    </form>
+    <a href = '{{url_for('showDestination', country_id = country_id)}}'>Cancel</a>
+</body>
+</html>

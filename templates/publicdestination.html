@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
+    <title>Destination</title>
+</head>
+<body>
+    <h1>{{country.name}}</h1>
+
+    <a href="#" value='Create'>Create New Destination</a>
+
+    {% for destination in destinations %} <br><br>
+    <h2>{{ destination.name }}</h2>
+    {{ destination.description }} <br><br>
+    {{ destination.location }} <br><br>
+    <a href='{{ url_for('editDestination', country_id=country.id, destination_id=destination.id) }}'> Edit country</a> <br>
+    <a href='{{ url_for('deleteDestination', country_id=country.id, destination_id=destination.id) }}'> Delete country</a> <br><br>
+    
+    {% endfor %} <br>
+
+</body>
+</html>
