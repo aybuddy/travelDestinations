@@ -7,7 +7,7 @@ from database_setup1 import Base, Country, Destination, User
 
 from flask import session as login_session
 import random, string
-
+"""
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
@@ -18,14 +18,14 @@ import requests
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Travel Destinations Application"
-
+"""
 engine = create_engine('sqlite:///traveldestinations.db')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-
+"""
 # login
 @app.route('/login')
 def showLogin():
@@ -115,7 +115,7 @@ def gconnect():
     #print "done!"
     return output
 
-# user creation and information
+ user creation and information
 def createUser(login_session):
     newUser = User(name=login_session['username'], email=login_session['email'], picture=login_session['picture'])
     session.add(newUser)
@@ -158,24 +158,19 @@ def gdisconnect():
         response = make_response(json.dumps('Unable to revoke token'), 400)
         response.headers['Content-Type'] = 'application/json'
         return response
-
+"""
 # show countries
 @app.route('/')
 @app.route('/country/')
 def showCountries():
     countries = session.query(Country).order_by(Country.name)
-    if 'username' not in login_session:
-        return render_template('publiccountry.html', countries=countries)
-    else:
-        return render_template('country.html', countries=countries)
+    return render_template('country.html', countries=countries)
 
 # add new countries
 @app.route('/country/new', methods=['GET', 'POST'])
 def newCountry():
-    if 'username' not in login_session:
-        return redirect('/login')
     if request.method == 'POST':
-        newCountry = Country(name=request.form['name'], user_id = login_session['user_id'])     
+        newCountry = Country(name=request.form['name']) #, user_id = login_session['user_id'])     
         session.add(newCountry)
         flash('New Country %s Successfully Created' % newCountry.name)
         session.commit()
@@ -187,10 +182,6 @@ def newCountry():
 @app.route('/country/<int:country_id>/edit', methods=['GET', 'POST'])
 def editCountry(country_id):
     editedCountry = session.query(Country).filter_by(id=country_id).one()
-    if 'username' not in login_session:
-        return redirect('/login')
-    if editedCountry.user_id != login_session['user_id']:
-         return "<script>function myFunction() {alert('You are not authorized to edit this country. Please create your own country in order to edit.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         if request.form['name']:
             editedCountry.name = request.form['name']
@@ -203,10 +194,6 @@ def editCountry(country_id):
 @app.route('/country/<int:country_id>/delete', methods=['GET', 'POST'])
 def deleteCountry(country_id):
     countryToDelete = session.query(Country).filter_by(id=country_id).one()
-    if 'username' not in login_session:
-        return redirect('/login')
-    if countryToDelete.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not the authorized to delete this country. Please create your own country in order to delete.');}</script><body onload='myFunction()''>"
     if request.method == 'POST':
         session.delete(countryToDelete)
         flash('%s Successfully Deleted' % countryToDelete.name)
@@ -220,20 +207,13 @@ def deleteCountry(country_id):
 @app.route('/country/<int:country_id>/destination')
 def showDestination(country_id):
     country = session.query(Country).filter_by(id = country_id).one()
-    creator = getUserInfo(country.user_id)
-    destinations = session.query(Destination).filter_by(id=country_id)
-    if 'username' not in login_session or creator.id != login_session['user_id']:
-        return render_template('publicdestination.html', destinations=destinations, country=country, creator=creator)
-    return render_template('destination.html', destinations=destinations, country=country, creator=creator)
+    destinations = session.query(Destination).filter_by(country_id=country_id).all()
+    return render_template('destination.html', destinations=destinations, country=country)
 
 # add new destination
 @app.route('/country/<int:country_id>/destination/new', methods=['GET', 'POST'])
 def newDestination(country_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     country = session.query(Country).filter_by(id=country_id).one()
-    if login_session['user_id'] != country.user_id:
-        return "<script>funtion myFunction() {alert('You are not authorized to add destinations to this country. Please create your own country in order to add destinations.');}</script><body onload='myFunction()'"
     if request.method == 'POST':
         newDestination = Destination(name=request.form['name'], description=['description'], location=['location'], country_id=country_id)
         session.add(newDestination)
@@ -246,12 +226,8 @@ def newDestination(country_id):
 # edit destination
 @app.route('/country/<int:country_id>/destination/<int:destination_id>/edit', methods=['GET', 'POST'])
 def editDestination(country_id, destination_id):
-    #if 'username' not in login_session:
-    #    return redirect('/login')
     editedDestination = session.query(Destination).filter_by(id=destination_id).one()
     country = session.query(Country).filter_by(id=country_id).one()
-    if login_session['user_id'] != country.user_id:
-        return "<script>function myFunction() {alert('You are not authorized to edit destinations for this country. Please create your own country in order to edit destinations.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         if request.form['name']:
             editedDestination.name = request.form['name']
@@ -269,12 +245,8 @@ def editDestination(country_id, destination_id):
 # delete destination
 @app.route('/country/<int:country_id>/destination/<int:destination_id>/delete', methods=['GET', 'POST'])
 def deleteDestination(country_id, destination_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     country = session.query(Country).filter_by(id=country_id).one()
     destinationToDelete = session.query(Country).filter_by(id=destination_id).one()
-    if login_session['user_id'] != Country.user_id:
-        return "<script>function myFunction() {alert('You are not authorized to delete destinations for this country. Please create your own country in order to delete destinations.');}</script><body onload='myFunction()'>" 
     if request.method == 'POST':
         session.delete(destinationToDelete)
         session.commit()

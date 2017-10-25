@@ -9,10 +9,9 @@
 <body>
     <h1>Are you sure you want to delete destination</h1>
 
-    <form action='{{ url_for('deleteDestination', country_id = country_id, destination_id=destination.id)}}' method = 'post'>
+    
         <input type="submit" value='Delete'><br><br>
         
-    </form>
-    <a href = '{{url_for('showDestination', country_id = country_id)}}'>Cancel</a>
+    <a href ="#">Cancel</a>
 </body>
 </html>
