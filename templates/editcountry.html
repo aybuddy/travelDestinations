@@ -1,20 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Edit Country</title>
-</head>
-<body>
-    <h1>Edit Country</h1>
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
 
-    <form action="#" method='post'>
-        <p>Name:</p>
-            <input type='text' size='30' name='name'>
-            <input type='submit' value='Edit'>
-            <a href="#">Cancel</a>
-    </form>
-    
-</body>
-</html>
+<div class="jumbotron jumbotron-fluid" id="hero-edit-country">
+    <div class="container-fluid hero-text">
+        <h1 class="display-3 hero-header">{{ country.name }}</h1>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <form class="form-style">
+            <div class="form-group">
+                <label class="col-form-label" for="editCountry">Edit Country</label>
+                <input type="text" class="form-control" size="35" id="editCountry" placeholder="Edit Country"><br>
+                <button type="submit" class="btn btn-primary">Edit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% include "footer.html" %}  
+{% endblock %}

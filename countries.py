@@ -219,7 +219,7 @@ def newDestination(country_id):
         session.add(newDestination)
         session.commit()
         flash('New Destination %s Successfully Created' % (newDestination.name))
-        return redirect(url_for('showDestination', country_id=country_id))
+        return redirect(url_for('showDestination', country_idd=country_id))
     else:
         return render_template('newdestination.html', country_iddd=country_id)
 
