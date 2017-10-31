@@ -11,6 +11,20 @@
     <h1 class="text-center">{{ country.name }}</h1>
 </div>
 
+<div class="alert alert-primary alert-dismissible fade show flash" role="alert">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    
+        {% for message in messages %}
+    <span><strong>{{ message }}</strong></span>
+        {% endfor %}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+    {% endif %}
+    {% endwith %}
+</div>
+
 <div class="container-fluid image-container">
     <div class="card bg-dark text-white card-style">
         <img class="card-img card-background" src="https://images.unsplash.com/photo-1489693122859-1adfda4e17f0?w=1950&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="New Country">

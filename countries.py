@@ -25,14 +25,15 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-"""
+
 # login
 @app.route('/login')
 def showLogin():
-    state = ''.join(random.choice(string.ascii_uppercase+string.digits) for x in xrange(32))
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
     login_session['state'] = state
-    return render_template('login.html', STATE=state)
-
+    return "The current session state is %s" % login_session['state']
+    # return render_template('login.html', STATE=state)
+"""
 # gConnect
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -247,9 +248,9 @@ def editDestination(country_id, destination_id):
 @app.route('/country/<int:country_id>/destination/<int:destination_id>/delete', methods=['GET', 'POST'])
 def deleteDestination(country_id, destination_id):
     country = session.query(Country).filter_by(id=country_id).one()
-    print "~~~**country: ", country
+    # print "~~~**country: ", country
     destinationToDelete = session.query(Destination).filter_by(id=destination_id).one_or_none()
-    print "~~~**destination: ", destinationToDelete
+    # print "~~~**destination: ", destinationToDelete
     if request.method == 'POST':
         session.delete(destinationToDelete)
         session.commit()

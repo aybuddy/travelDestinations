@@ -120,6 +120,11 @@ body {
     color: white;
 }
 
+/* Flash */
+.flash {
+    background-color: black;
+    color: white;
+}
 
 /* Cards */
 
