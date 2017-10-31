@@ -1,29 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Edit Destination</h1>
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
 
-    <form action="{{ url_for('editDestination', country_id = country_id, destination_id=destination.id)}}" method = 'post'>
-        <dl>
-            <dt>Name:</dt>
-                <dd><input type ='text' size='30' name='name' placeholder = '{{destination.name }}'></dd>
-            <dt>Description:</dt>
-                <dd><textarea name = 'description' rows='5' cols='40' placeholder = '{{destination.description }}'></textarea></dd>
-            <dt>Location:</dt>
-                <dd><input type = 'text' size = '18' name='location' placeholder = '{{destination.location}}'></dd>
-        </dl>
-    </form>
+<div class="jumbotron jumbotron-fluid" id="hero-edit-destination">
+    <div class="container-fluid hero-text">
+        <h1 class="display-3 hero-header">Edit Destination</h1>
+    </div>
+</div>
 
-    <input type='submit' value='Edit'>
-    
-    <a href = '{{url_for('showDestination', country_id = country_id)}}'> Cancel </a>
-    
-</body>
-</html>
+<div class="container-fluid">
+    <div class="row">
+        <form action="{{ url_for('editDestination', country_id=country_id, destination_id=destination_id) }}" class="form-style" method="POST">
+            <div class="form-group">
+                <label class="col-form-label" for="name">Edit Destination</label>
+                <input type="text" class="form-control" size="35" name="name" placeholder="{{ destination.name }}"><br>                    
+            </div>
+            <div class="form-group">
+                <label class="col-form-label" for="location">Edit Location</label>
+                <input type="text" class="form-control" name="location" placeholder="{{ destination.location }}">
+            </div>
+            <div class="form-group">
+                <label class="col-form-label" for="description">Edit Description</label>
+                <input type="text" class="form-control" name="description" placeholder="{{ destination.description }}">
+            </div>
+              <button type="submit" class="btn btn-primary">Edit</button>
+              <a href="{{ url_for('showCountries', country_id=country_id) }}" class="btn btn-outline-warning">Cancel</a>
+        </form>
+    </div>
+</div>
+
+{% include "footer.html" %}  
+{% endblock %}

@@ -3,7 +3,7 @@ app = Flask(__name__)
 
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
-from database_setup1 import Base, Country, Destination, User
+from database_setup1 import Base, Country, Destination
 
 from flask import session as login_session
 import random, string
@@ -185,8 +185,8 @@ def editCountry(country_id):
     if request.method == 'POST':
         if request.form['name']:
             editedCountry.name = request.form['name']
-            flash('Country Successfully Edited %s' % editedCountry.name)
-            return redirect(url_for('showCountries'))
+        flash('Country Successfully Edited %s' % editedCountry.name)
+        return redirect(url_for('showCountries'))
     else:
         return render_template('editcountry.html', country=editedCountry)
 
@@ -205,6 +205,7 @@ def deleteCountry(country_id):
 # show destinations
 @app.route('/country/<int:country_id>/')
 @app.route('/country/<int:country_id>/destination')
+@app.route('/country/<int:country_id>/destination/')
 def showDestination(country_id):
     country = session.query(Country).filter_by(id = country_id).one()
     destinations = session.query(Destination).filter_by(country_id=country_id).all()
@@ -215,13 +216,13 @@ def showDestination(country_id):
 def newDestination(country_id):
     country = session.query(Country).filter_by(id=country_id).one()
     if request.method == 'POST':
-        newDestination = Destination(name=request.form['name'], description=['description'], location=['location'], country_id=country_id)
+        newDestination = Destination(name=request.form['name'], location=request.form['location'], description=request.form['description'], country_id=country_id)        
         session.add(newDestination)
         session.commit()
         flash('New Destination %s Successfully Created' % (newDestination.name))
-        return redirect(url_for('showDestination', country_idd=country_id))
+        return redirect(url_for('showDestination', country_id=country_id))        
     else:
-        return render_template('newdestination.html', country_iddd=country_id)
+        return render_template('newdestination.html', country_id=country_id)
 
 # edit destination
 @app.route('/country/<int:country_id>/destination/<int:destination_id>/edit', methods=['GET', 'POST'])
@@ -231,14 +232,14 @@ def editDestination(country_id, destination_id):
     if request.method == 'POST':
         if request.form['name']:
             editedDestination.name = request.form['name']
-        if request.form['description']:
-            editedDestination.description = request.form['description']
         if request.form['location']:
             editedDestination.location = request.form['location']
+        if request.form['description']:
+            editedDestination.description = request.form['description']
         session.add(editedDestination)
         session.commit()
         flash('Destination Successfully Edited')
-        return redirect(url_for('showDestination'), country_id=country_id)
+        return redirect(url_for('showDestination', country_id=country_id))
     else:
         return render_template('editdestination.html', country_id=country_id, destination_id=destination_id, destination=editedDestination)
 
@@ -246,14 +247,16 @@ def editDestination(country_id, destination_id):
 @app.route('/country/<int:country_id>/destination/<int:destination_id>/delete', methods=['GET', 'POST'])
 def deleteDestination(country_id, destination_id):
     country = session.query(Country).filter_by(id=country_id).one()
-    destinationToDelete = session.query(Country).filter_by(id=destination_id).one()
+    print "~~~**country: ", country
+    destinationToDelete = session.query(Destination).filter_by(id=destination_id).one_or_none()
+    print "~~~**destination: ", destinationToDelete
     if request.method == 'POST':
         session.delete(destinationToDelete)
         session.commit()
         flash('Destination Successfully Deleted')
         return redirect(url_for('showDestination', country_id=country_id))
     else:
-        return render_template('deletedestination.html', destination=destinationToDelete)
+        return render_template('deletedestination.html', destinationss=destinationToDelete, country_id=country_id, destination_id=destination_id)
 
 # destination JSON
 @app.route('/country/<int:country_id>/destination/JSON')

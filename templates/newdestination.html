@@ -1,30 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>New Destination</title>
-</head>
-<body>
-    <h1>New Destination</h1>
-    {{ country_iddd }}
-    <form action="submit" method='post'>
-        <p>Name:</p>
-        <input type="text" size='30'>
-    </form>
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
 
-    <form action="submit" method='post'>
-        <p>Description:</p>
-        <input type="text" size='30'>
+<div class="jumbotron jumbotron-fluid" id="hero-new-destination">
+    <div class="container-fluid hero-text">
+        <h1 class="display-3 hero-header">Destinations</h1>
+        <h2>The places you go</h2>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <form action="{{ url_for('newDestination', country=country, country_id=country_id) }}" class="form-style" method="POST">
+            <div class="form-group">
+                <label class="col-form-label" for="name">Add New Destination</label>
+                <input type="text" class="form-control" size="35" name="name" placeholder="Add New Destination"><br>                    
+            </div>
+            <div class="form-group">
+                <label class="col-form-label" for="location">Add New Location</label>
+                <input type="text" class="form-control" size="35" name="location" placeholder="Location">
+            </div>
+            <div class="form-group">
+                <label class="col-form-label" for="description">Add New Description</label>
+                <input type="text" class="form-control" name="description" placeholder="Description">
+            </div>
+              <button type="submit" class="btn btn-primary">Let's Go!</button>
+              <a href="{{ url_for('showDestination', country_id=country_id) }}" class="btn btn-outline-warning">Cancel</a>
         </form>
+    </div>
+</div>
 
-    <form action="submit" method='post'>
-        <p>Location:</p>
-        <input type="text" size='30'>
-    </form>
-    <br>
-    {{ endfor }}
-
-</body>
-</html>
+{% include "footer.html" %}  
+{% endblock %}

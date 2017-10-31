@@ -1,17 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Delete Destination</title>
-</head>
-<body>
-    <h1>Are you sure you want to delete destination</h1>
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
 
-    
-        <input type="submit" value='Delete'><br><br>
-        
-    <a href ="#">Cancel</a>
-</body>
-</html>
+<div class="jumbotron jumbotron-fluid" id="hero-delete-destination">
+    <div class="container-fluid hero-text">
+        <h1 class="display-3 hero-header">{{ destinationss.name }}</h1>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <h1 class="text-center font-weight-light">Are you sure you want to delete {{ destinationss.name }}?</h1>
+</div>
+
+<div class="container-fluid"> 
+    <div class="row">
+        <form action="{{ url_for('deleteDestination', country_id=country_id, destination_id=destination_id, destinationss=destinationToDelete) }}" class="form-style" method="POST">
+            <div class="form-group">
+                <button type="submit" class="btn btn-outline-danger">Delete</button>
+                <a href="{{ url_for('showDestination', country_id=country_id )}}" class="btn btn-outline-warning">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% include "footer.html" %}  
+{% endblock %}

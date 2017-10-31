@@ -1,22 +1,68 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
-    <title>Countries</title>
-</head>
-<body>
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
 
-    <h1> Countries  </h1>
-    
+    <div class="jumbotron jumbotron-fluid" id="hero-country">
+        <div class="container-fluid hero-text">
+            <h1 class="display-3 hero-header">Travel Destinations</h1>
+            <h2>Wanderlust</h2>
+        </div>
+    </div>
 
-    {% for country in countries %} <br>
-    <h2>{{ country.name }}</h2><br>
-    <a href="editcountry.html"> Edit country</a> <br>
-    <a href="deletecountry.html"> Delete country</a> <br><br>
-    
+    <div class="container-fluid image-container">
+        <div class="card bg-dark text-white card-style">
+            <img class="card-img card-background" src="https://images.unsplash.com/photo-1489693122859-1adfda4e17f0?w=1950&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="New Country">
+            <div class="card-img-overlay">
+                <h1 class="card-title display-2">Where to?</h1>
+                <a href="newcountry.html" class="card-link btn btn-outline-light" role="button">Add New Country</a>
+            </div>
+        </div>
+    </div>
+
+    {% for country in countries %}
+    <div class="container-fluid image-container">
+        <div class="card bg-dark text-white card-style">
+            <img class="card-img card-background" src="https://images.unsplash.com/photo-1483030096298-4ca126b58199?w=1050&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="Card image 1">
+            <div class="card-img-overlay">
+                <h2 class="card-title display-2">{{ country.name }}</h2>
+            <!--    <a href="editcountry.html" class="card-link btn btn-outline-light" role="button">Edit</a>
+                <a href="deletecountry.html" class="card-link btn btn-outline-danger" role="button">Delete</a>
+            -->
+            </div>
+        </div>
+    </div>
+    <!--
+    <div class="container-fluid image-container">
+        <div class="card bg-dark text-white card-style">
+            <img class="card-img card-background" src="https://images.unsplash.com/photo-1428094479093-8973a318bd76?w=1050&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="Card image 2">
+            <div class="card-img-overlay">
+                <h2 class="card-title display-2">{{ country.name }}</h2>
+                <a href="editcountry.html" class="card-link btn btn-outline-light" role="button">Edit</a>
+                <a href="deletecountry.html" class="card-link btn btn-outline-danger" role="button">Delete</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid image-container">
+        <div class="card bg-dark text-white card-style">
+            <img class="card-img card-background" src="https://images.unsplash.com/photo-1493708638467-241317300c83?w=1050&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="Card image 3">
+            <div class="card-img-overlay">
+                <h2 class="card-title display-2">{{ country.name }}</h2>
+                <a href="editcountry.html" class="card-link btn btn-outline-light" role="button">Edit</a>
+                <a href="deletecountry.html" class="card-link btn btn-outline-danger" role="button">Delete</a>
+            </div>
+        </div>
+    </div>
+-->
     {% endfor %}
-</body>
-</html>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-6">
+                <h2>THIS DIV WILL CONTAIN SOME TYPE OF SOMETHING</h2>
+            </div>
+        </div>
+    </div>
+
+{% include "footer.html" %}  
+{% endblock %}

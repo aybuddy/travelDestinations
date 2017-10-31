@@ -1,25 +1,102 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
-    <title>Destination</title>
-</head>
-<body>
-    <h1>{{country.name}}</h1>
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
 
-    <a href="#" value='Create'>Create New Destination</a>
+<div class="jumbotron jumbotron-fluid" id="hero-destination">
+    <div class="container-fluid hero-text">
+    </div>
+</div>  
 
-    {% for destination in destinations %} <br><br>
-    <h2>{{ destination.name }}</h2>
-    {{ destination.description }} <br><br>
-    {{ destination.location }} <br><br>
-    <a href='{{ url_for('editDestination', country_id=country.id, destination_id=destination.id) }}'> Edit country</a> <br>
-    <a href='{{ url_for('deleteDestination', country_id=country.id, destination_id=destination.id) }}'> Delete country</a> <br><br>
-    
-    {% endfor %} <br>
+<div class="container-fluid">
+    <h1 class="text-center">{{ country.name }}</h1>
+</div>
 
-</body>
-</html>
+<div class="container-fluid image-container">
+    <div class="card bg-dark text-white card-style">
+        <img class="card-img card-background" src="https://images.unsplash.com/photo-1489693122859-1adfda4e17f0?w=1950&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="New Country">
+        <div class="card-img-overlay">
+            <h1 class="card-title display-2">Where to?</h1>
+            <a href="{{ url_for('newDestination', country_id=country.id) }}" class="card-link btn btn-outline-light" role="button">Add New Destination</a>
+        </div>
+    </div>
+</div>
+
+{% for destination in destinations %}
+<div class="container-fluid card-container">
+    <div class="card-deck">
+        <div class="card">
+            <img class="card-img-top" src="https://images.unsplash.com/photo-1488703480497-dfcccd4894d1?w=1049&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="Card image cap 1">
+            <div class="card-body">
+                <h4 class="card-title card-deck-style">{{ destination.name }}</h4>
+                <p class="card-text card-deck-style">{{ destination.location }}</p>
+                <p class="card-text lead">{{ destination.description }}</p> 
+                <a href="{{ url_for('editDestination', country_id=country.id, destination_id=destination.id) }}" class="card-link btn btn-outline-dark" role="button">Edit</a>
+                <a href="{{ url_for('deleteDestination', country_id=country.id, destination_id=destination.id) }}" class="card-link btn btn-outline-danger" role="button">Delete</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <img class="card-img-top" src="https://images.unsplash.com/photo-1488215545351-57e673dc3789?w=1023&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="Card image cap 2">
+            <div class="card-body">
+                <h4 class="card-title card-deck-style">Destination</h4>
+                <p class="card-text card-deck-style">Location</p>
+                <p class="card-text lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
+                <a href="#" class="card-link btn btn-outline-dark" role="button">Edit</a>
+                <a href="#" class="card-link btn btn-outline-danger" role="button">Delete</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <img class="card-img-top" src="https://images.unsplash.com/photo-1451903978882-b165bd94e45d?w=1050&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="Card image cap 3">
+            <div class="card-body">
+                <h4 class="card-title card-deck-style">Destination</h4>
+                <p class="card-text card-deck-style">Location</p>
+                <p class="card-text lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
+                <a href="#" class="card-link btn btn-outline-dark" role="button">Edit</a>
+                <a href="#" class="card-link btn btn-outline-danger" role="button">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- <div class="container-fluid card-container">
+    <div class="card-deck">
+        <div class="card">
+            <img class="card-img-top" src="https://images.unsplash.com/photo-1489593951513-b3a219ba7872?w=1000&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="Card image cap 4">
+            <div class="card-body">
+                <h4 class="card-title card-deck-style">Destination</h4>
+                <p class="card-text card-deck-style">Location</p>
+                <p class="card-text lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p> 
+                <a href="#" class="card-link btn btn-outline-dark" role="button">Edit</a>
+                <a href="#" class="card-link btn btn-outline-danger" role="button">Delete</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <img class="card-img-top" src="https://images.unsplash.com/photo-1503104323792-3f881b707739?w=1050&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="Card image cap 5">
+            <div class="card-body">
+                <h4 class="card-title card-deck-style">Destination</h4>
+                <p class="card-text card-deck-style">Location</p>
+                <p class="card-text lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
+                <a href="#" class="card-link btn btn-outline-dark" role="button">Edit</a>
+                <a href="#" class="card-link btn btn-outline-danger" role="button">Delete</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <img class="card-img-top" src="https://images.unsplash.com/photo-1471419380910-2d50d929cbb7?w=1050&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="Card image cap 6">
+            <div class="card-body">
+                <h4 class="card-title card-deck-style">Destination</h4>
+                <p class="card-text card-deck-style">Location</p>
+                <p class="card-text lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
+                <a href="#" class="card-link btn btn-outline-dark" role="button">Edit</a>
+                <a href="#" class="card-link btn btn-outline-danger" role="button">Delete</a>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+
+{% include "footer.html" %}  
+{% endblock %}

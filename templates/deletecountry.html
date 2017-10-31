@@ -16,9 +16,10 @@
     <div class="row">
         <form action="#" class="form-style" method="POST">
             <div class="form-group">
-                <label class="col-form-label" for="deleteCountry">Delete {{ country.name }}?</label>
+            <!--    <label class="col-form-label" for="deleteCountry">Delete {{ country.name }}?</label>
                 <input type="text" class="form-control" size="35" id="deleteCountry" placeholder="Delete {{ country.name }}"><br>
-                <button type="submit" class="btn btn-outline-danger">Delete</button>
+            -->    
+                <button type="submit" class="btn btn-outline-danger" id="submit">Delete</button>
                 <a href="{{ url_for('showCountries') }}" class="btn btn-outline-warning">Cancel</a>
             </div>
         </form>
