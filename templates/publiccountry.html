@@ -14,7 +14,7 @@
             <img class="card-img card-background" src="https://images.unsplash.com/photo-1489693122859-1adfda4e17f0?w=1950&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="New Country">
             <div class="card-img-overlay">
                 <h1 class="card-title display-2">Where to?</h1>
-                <a href="newcountry.html" class="card-link btn btn-outline-light" role="button">Add New Country</a>
+                <!-- <a href="newcountry.html" class="card-link btn btn-outline-light" role="button">Add New Country</a> -->
             </div>
         </div>
     </div>
@@ -24,7 +24,9 @@
         <div class="card bg-dark text-white card-style">
             <img class="card-img card-background" src="https://images.unsplash.com/photo-1483030096298-4ca126b58199?w=1050&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="Card image 1">
             <div class="card-img-overlay">
+                <a href="{{ url_for('showDestination', country_id=country.id) }}">            
                 <h2 class="card-title display-2">{{ country.name }}</h2>
+                </a>
             <!--    <a href="editcountry.html" class="card-link btn btn-outline-light" role="button">Edit</a>
                 <a href="deletecountry.html" class="card-link btn btn-outline-danger" role="button">Delete</a>
             -->

@@ -85,6 +85,7 @@ def gconnect():
         return response
 
     # store the access token in the session for later use
+    
     login_session['access_token'] = credentials.access_token
     login_session['gplus_id'] = gplus_id
 
@@ -140,20 +141,20 @@ def getUserID(email):
 @app.route('/gdisconnect')
 def gdisconnect():
     access_token = login_session.get('access_token')
-    print "~~~** login_session", login_session
+    # print "~~~** login_session", login_session
     if access_token is None:
-        print "Access token is none"
+        # print "Access token is none"
         response = make_response(json.dumps('Current User not connected'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    print "~~~** access token", access_token
-    print 'User name is: '
-    print login_session['username']
+    # print "~~~** access token", access_token
+    # print 'User name is: '
+    # print login_session['username']
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
-    print 'result is '
-    print result
+    # print 'result is '
+    # print result
     if result['status'] == '200':
         del login_session['access_token']
         del login_session['gplus_id']
@@ -168,13 +169,100 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
+# facebook login
+@app.route('/fbconnect', methods=['POST'])
+def fbconnect():
+    if request.args.get('state') != login_session['state']:
+        response = make_response(json.dumps('Invalid state parameter.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    access_token = request.data
+    print "access token received %s " % access_token
+
+    app_id = json.loads(open('fb_client_secrets.json', 'r').read())[
+        'web']['app_id']
+    app_secret = json.loads(
+        open('fb_client_secrets.json', 'r').read())['web']['app_secret']
+    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
+        app_id, app_secret, access_token)
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+
+
+    # Use token to get user info from API
+    userinfo_url = "https://graph.facebook.com/v2.10/me"
+    '''
+        Due to the formatting for the result from the server token exchange we have to
+        split the token first on commas and select the first index which gives us the key : value
+        for the server access token then we split it on colons to pull out the actual token value
+        and replace the remaining quotes with nothing so that it can be used directly in the graph
+        api calls
+    '''
+    token = result.split(',')[0].split(':')[1].replace('"', '')
+
+    url = 'https://graph.facebook.com/v2.10/me?access_token=%s&fields=name,id,email' % token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+    # print "url sent for API access:%s"% url
+    # print "API JSON result: %s" % result
+    data = json.loads(result)
+    login_session['provider'] = 'facebook'
+    login_session['username'] = data["name"]
+    login_session['email'] = data["email"]
+    login_session['facebook_id'] = data["id"]
+
+    # The token must be stored in the login_session in order to properly logout
+    login_session['access_token'] = token
+
+    # Get user picture
+    url = 'https://graph.facebook.com/v2.10/me/picture?access_token=%s&redirect=0&height=200&width=200' % token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+    data = json.loads(result)
+
+    login_session['picture'] = data["data"]["url"]
+
+    # see if user exists
+    user_id = getUserID(login_session['email'])
+    if not user_id:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
+
+    output = ''
+    output += '<h1>Welcome, '
+    output += login_session['username']
+
+    output += '!</h1>'
+    output += '<img src="'
+    output += login_session['picture']
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+
+    flash("Now logged in as %s" % login_session['username'])
+    return output
+
+#facebook disconnect
+@app.route('/fbdisconnect')
+def fbdisconnect():
+    facebook_id = login_session['facebook_id']
+    # The access token must me included to successfully logout
+    access_token = login_session['access_token']
+    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id,access_token)
+    h = httplib2.Http()
+    result = h.request(url, 'DELETE')[1]
+    return "you have been logged out"
+
+
+
 # show countries
 @app.route('/')
 @app.route('/country/')
 def showCountries():
     countries = session.query(Country).order_by(Country.name)
     # print "~~***country", countries
-    return render_template('country.html', countries=countries)
+    if 'username' not in login_session:
+        return render_template('publiccountry.html', countries=countries)
+    else:
+        return render_template('country.html', countries=countries)
 
 # add new countries
 @app.route('/country/new', methods=['GET', 'POST'])
@@ -196,6 +284,8 @@ def editCountry(country_id):
     if 'username' not in login_session:
         return redirect('/login')
     editedCountry = session.query(Country).filter_by(id=country_id).one()
+    if editedCountry.user_id != login_session['user_id']:
+        return "<script>function myFunction() {alert('You are not authorized to edit this country. Please add your own country in order to edit.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         if request.form['name']:
             editedCountry.name = request.form['name']
@@ -210,6 +300,8 @@ def deleteCountry(country_id):
     if 'username' not in login_session:
         return redirect('/login')
     countryToDelete = session.query(Country).filter_by(id=country_id).one()
+    if countryToDelete.user_id != login_session['user_id']:
+        return "<script>function myFunction() {alert('You are not the authorized to delete this country. Please add your own country in order to delete.');}</script><body onload='myFunction()''>"
     if request.method == 'POST':
         session.delete(countryToDelete)
         flash('%s Successfully Deleted' % countryToDelete.name)
@@ -224,8 +316,12 @@ def deleteCountry(country_id):
 @app.route('/country/<int:country_id>/destination/')
 def showDestination(country_id):
     country = session.query(Country).filter_by(id = country_id).one()
+    creator = getUserInfo(country.user_id)
     destinations = session.query(Destination).filter_by(country_id=country_id).all()
-    return render_template('destination.html', destinations=destinations, country=country)
+    if 'username' not in login_session or creator.id != login_session['user_id']:
+        return render_template('publicdestination.html', destinations=destinations, country=country, creator=creator)
+    else:
+        return render_template('destination.html', destinations=destinations, country=country)
 
 # add new destination
 @app.route('/country/<int:country_id>/destination/new', methods=['GET', 'POST'])
@@ -233,6 +329,8 @@ def newDestination(country_id):
     if 'username' not in login_session:
         return redirect('/login')
     country = session.query(Country).filter_by(id=country_id).one()
+    if login_session['user_id'] != country.user_id:
+        return "<script>funtion myFunction() {alert('You are not authorized to add a destination to this country. Please create your own country to add a destination.');}</script><body onload='myFunction()'"
     if request.method == 'POST':
         newDestination = Destination(name=request.form['name'], location=request.form['location'], description=request.form['description'], country_id=country_id, user_id=country.user_id)        
         session.add(newDestination)
@@ -249,6 +347,8 @@ def editDestination(country_id, destination_id):
         return redirect('/login')
     editedDestination = session.query(Destination).filter_by(id=destination_id).one()
     country = session.query(Country).filter_by(id=country_id).one()
+    if login_session['user_id'] != country.user_id:
+      return "<script>function myFunction() {alert('You are not authorized to edit destinations for this country. Please create your own country to edit destinations.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         if request.form['name']:
             editedDestination.name = request.form['name']
@@ -272,6 +372,8 @@ def deleteDestination(country_id, destination_id):
     # print "~~~**country: ", country
     destinationToDelete = session.query(Destination).filter_by(id=destination_id).one_or_none()
     # print "~~~**destination: ", destinationToDelete
+    if login_session['user_id'] != country.user_id:
+        return "<script>function myFunction() {alert('You are not authorized to delete destination for this country. Please create your own country to delete destination.');}</script><body onload='myFunction()'>" 
     if request.method == 'POST':
         session.delete(destinationToDelete)
         session.commit()
@@ -279,6 +381,29 @@ def deleteDestination(country_id, destination_id):
         return redirect(url_for('showDestination', country_id=country_id))
     else:
         return render_template('deletedestination.html', destinationss=destinationToDelete, country_id=country_id, destination_id=destination_id)
+
+# disconnect
+@app.route('/disconnect')
+def disconnect():
+    if 'provider' in login_session:
+        if login_session['provider'] == 'google':
+            gdisconnect()
+            del login_session['access_token']
+            del login_session['gplus_id']
+        if login_session['provider'] == 'facebook':
+            fbdisconnect()
+            del login_session['facebook_id']
+        
+        del login_session['username']
+        del login_session['email']
+        del login_session['user_id']
+        del login_session['picture']
+        del login_session['provider']
+        flash("You have been sucessfully logged out")
+        return redirect(url_for('showCountries'))
+    else:
+        flash("You were not logged in")
+        redirect(url_for('showCountries'))
 
 # destination JSON
 @app.route('/country/<int:country_id>/destination/JSON')
