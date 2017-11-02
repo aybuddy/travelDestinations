@@ -1,13 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
-app = Flask(__name__)
+
 
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
-from database_setup1 import Base, Country, Destination
+from database_setup1 import Base, Country, Destination, User
 
 from flask import session as login_session
 import random, string
-"""
+
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
@@ -15,11 +15,12 @@ import json
 from flask import make_response
 import requests
 
-CLIENT_ID = json.loads(
-    open('client_secrets.json', 'r').read())['web']['client_id']
+app = Flask(__name__)
+
+CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Travel Destinations Application"
-"""
-engine = create_engine('sqlite:///traveldestinations.db')
+
+engine = create_engine('sqlite:///traveldestinationswithusers.db')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
@@ -31,9 +32,8 @@ session = DBSession()
 def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
     login_session['state'] = state
-    return "The current session state is %s" % login_session['state']
-    # return render_template('login.html', STATE=state)
-"""
+    return render_template('login.html', STATE=state)
+
 # gConnect
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -85,7 +85,7 @@ def gconnect():
         return response
 
     # store the access token in the session for later use
-    login_session['credentials'] = credentials.access_token
+    login_session['access_token'] = credentials.access_token
     login_session['gplus_id'] = gplus_id
 
     #get user info
@@ -93,13 +93,14 @@ def gconnect():
     params = {'access_token': credentials.access_token, 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
 
-    data = json.loads(answer.text)
+    data = answer.json()
 
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
     login_session['provider'] = 'google'
 
+    # see if users exists, it not create one
     user_id = getUserID(login_session['email'])
     if not user_id:
         user_id = createUser(login_session)
@@ -116,7 +117,7 @@ def gconnect():
     #print "done!"
     return output
 
- user creation and information
+# user creation and information
 def createUser(login_session):
     newUser = User(name=login_session['username'], email=login_session['email'], picture=login_session['picture'])
     session.add(newUser)
@@ -139,13 +140,20 @@ def getUserID(email):
 @app.route('/gdisconnect')
 def gdisconnect():
     access_token = login_session.get('access_token')
+    print "~~~** login_session", login_session
     if access_token is None:
+        print "Access token is none"
         response = make_response(json.dumps('Current User not connected'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % 'access_token'
+    print "~~~** access token", access_token
+    print 'User name is: '
+    print login_session['username']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
+    print 'result is '
+    print result
     if result['status'] == '200':
         del login_session['access_token']
         del login_session['gplus_id']
@@ -153,25 +161,28 @@ def gdisconnect():
         del login_session['email']
         del login_session['picture']
         response = make_response(json.dumps('Successfully disconnected'), 200)
-        response.header['Content-Type'] = 'application/json'
+        response.headers['Content-Type'] = 'application/json'
         return response
     else:
         response = make_response(json.dumps('Unable to revoke token'), 400)
         response.headers['Content-Type'] = 'application/json'
         return response
-"""
+
 # show countries
 @app.route('/')
 @app.route('/country/')
 def showCountries():
     countries = session.query(Country).order_by(Country.name)
+    # print "~~***country", countries
     return render_template('country.html', countries=countries)
 
 # add new countries
 @app.route('/country/new', methods=['GET', 'POST'])
 def newCountry():
+    if 'username' not in login_session:
+        return redirect('/login')
     if request.method == 'POST':
-        newCountry = Country(name=request.form['name']) #, user_id = login_session['user_id'])     
+        newCountry = Country(name=request.form['name'], user_id=login_session['user_id'])   
         session.add(newCountry)
         flash('New Country %s Successfully Created' % newCountry.name)
         session.commit()
@@ -182,6 +193,8 @@ def newCountry():
 # edit countries
 @app.route('/country/<int:country_id>/edit', methods=['GET', 'POST'])
 def editCountry(country_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     editedCountry = session.query(Country).filter_by(id=country_id).one()
     if request.method == 'POST':
         if request.form['name']:
@@ -194,6 +207,8 @@ def editCountry(country_id):
 # delete countries
 @app.route('/country/<int:country_id>/delete', methods=['GET', 'POST'])
 def deleteCountry(country_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     countryToDelete = session.query(Country).filter_by(id=country_id).one()
     if request.method == 'POST':
         session.delete(countryToDelete)
@@ -215,9 +230,11 @@ def showDestination(country_id):
 # add new destination
 @app.route('/country/<int:country_id>/destination/new', methods=['GET', 'POST'])
 def newDestination(country_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     country = session.query(Country).filter_by(id=country_id).one()
     if request.method == 'POST':
-        newDestination = Destination(name=request.form['name'], location=request.form['location'], description=request.form['description'], country_id=country_id)        
+        newDestination = Destination(name=request.form['name'], location=request.form['location'], description=request.form['description'], country_id=country_id, user_id=country.user_id)        
         session.add(newDestination)
         session.commit()
         flash('New Destination %s Successfully Created' % (newDestination.name))
@@ -228,6 +245,8 @@ def newDestination(country_id):
 # edit destination
 @app.route('/country/<int:country_id>/destination/<int:destination_id>/edit', methods=['GET', 'POST'])
 def editDestination(country_id, destination_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     editedDestination = session.query(Destination).filter_by(id=destination_id).one()
     country = session.query(Country).filter_by(id=country_id).one()
     if request.method == 'POST':
@@ -247,6 +266,8 @@ def editDestination(country_id, destination_id):
 # delete destination
 @app.route('/country/<int:country_id>/destination/<int:destination_id>/delete', methods=['GET', 'POST'])
 def deleteDestination(country_id, destination_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     country = session.query(Country).filter_by(id=country_id).one()
     # print "~~~**country: ", country
     destinationToDelete = session.query(Destination).filter_by(id=destination_id).one_or_none()

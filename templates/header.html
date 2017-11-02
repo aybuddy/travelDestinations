@@ -14,11 +14,12 @@
                 </li>
             </ul>
             <form class="form-inline my-2 my-lg-0">
-            <!--    {% if 'username' not in session %}
-                <a href="#" class="btn btn-outline-success" role="button">Login</a>
-                <a href="#" class="btn btn-outline-danger" role="button">Logout</a>
+               {% if 'username' not in session %}
+                <a href="{{ url_for('showLogin')}}" class="btn btn-outline-success" role="button">Login</a>
+                {% else %}
+                <a href="{{ url_for('gdisconnect')}}" class="btn btn-outline-danger" role="button">Logout</a>
                 {% endif %}
-            -->
+           
             </form>
         </div>
     </nav>
