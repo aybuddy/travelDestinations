@@ -22,7 +22,7 @@
     {% for country in countries %}
     <div class="container-fluid image-container">
         <div class="card bg-dark text-white card-style">
-            <img class="card-img card-background" src="https://images.unsplash.com/photo-1483030096298-4ca126b58199?w=1050&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="Card image 1">
+            <img class="card-img card-background" src="{{ country.image }}" alt="Card image 1">
             <div class="card-img-overlay">
                 <a href="{{ url_for('showDestination', country_id=country.id) }}">
                     <h2 class="card-title display-2">{{ country.name }}</h2>
@@ -33,8 +33,8 @@
             </div>
         </div>
     </div>
-    <!--
-    <div class="container-fluid image-container">
+    
+    <!-- <div class="container-fluid image-container">
         <div class="card bg-dark text-white card-style">
             <img class="card-img card-background" src="https://images.unsplash.com/photo-1428094479093-8973a318bd76?w=1050&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="Card image 2">
             <div class="card-img-overlay">
@@ -54,8 +54,8 @@
                 <a href="deletecountry.html" class="card-link btn btn-outline-danger" role="button">Delete</a>
             </div>
         </div>
-    </div>
--->
+    </div> -->
+
     {% endfor %}
 
     <div class="container">

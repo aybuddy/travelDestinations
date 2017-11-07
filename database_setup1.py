@@ -21,6 +21,7 @@ class Country(Base):
     name = Column(String(32), nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
+    image = Column(String(250))
 
     @property
     def serialize(self):
@@ -39,6 +40,7 @@ class Destination(Base):
     country = relationship(Country)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
+    image = Column(String(250))
 
     @property
     def serialize(self):

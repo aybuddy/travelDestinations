@@ -24,6 +24,10 @@
                 <label class="col-form-label" for="description">Add New Description</label>
                 <input type="text" class="form-control" name="description" placeholder="Description">
             </div>
+            <div class="form-group">
+                <label class="col-form-label" for="image">Add New Image URL</label>
+                <input type="text" class="form-control" name="image" placeholder="Image">
+            </div>
               <button type="submit" class="btn btn-primary">Let's Go!</button>
               <a href="{{ url_for('showDestination', country_id=country_id) }}" class="btn btn-outline-warning">Cancel</a>
         </form>

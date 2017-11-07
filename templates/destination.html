@@ -35,44 +35,27 @@
     </div>
 </div>
 
-{% for destination in destinations %}
+
 <div class="container-fluid card-container">
     <div class="card-deck">
-        <div class="card">
-            <img class="card-img-top" src="https://images.unsplash.com/photo-1488703480497-dfcccd4894d1?w=1049&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="Card image cap 1">
-            <div class="card-body">
-                <h4 class="card-title card-deck-style">{{ destination.name }}</h4>
-                <p class="card-text card-deck-style">{{ destination.location }}</p>
-                <p class="card-text lead">{{ destination.description }}</p> 
-                <a href="{{ url_for('editDestination', country_id=country.id, destination_id=destination.id) }}" class="card-link btn btn-outline-dark" role="button">Edit</a>
-                <a href="{{ url_for('deleteDestination', country_id=country.id, destination_id=destination.id) }}" class="card-link btn btn-outline-danger" role="button">Delete</a>
+            
+        <!-- <div class = "row"> -->
+            {% for destination in destinations %}
+            <div class="card">
+                <img class="card-img-top" src="{{ destination.image }}" alt="Card image cap 1">
+                <div class="card-body">
+                    <h4 class="card-title card-deck-style">{{ destination.name }}</h4>
+                    <p class="card-text card-deck-style">{{ destination.location }}</p>
+                    <p class="card-text lead">{{ destination.description }}</p> 
+                    <a href="{{ url_for('editDestination', country_id=country.id, destination_id=destination.id) }}" class="card-link btn btn-outline-dark" role="button">Edit</a>
+                    <a href="{{ url_for('deleteDestination', country_id=country.id, destination_id=destination.id) }}" class="card-link btn btn-outline-danger" role="button">Delete</a>
+                </div>
             </div>
-        </div>
-
-        <div class="card">
-            <img class="card-img-top" src="https://images.unsplash.com/photo-1488215545351-57e673dc3789?w=1023&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="Card image cap 2">
-            <div class="card-body">
-                <h4 class="card-title card-deck-style">Destination</h4>
-                <p class="card-text card-deck-style">Location</p>
-                <p class="card-text lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
-                <a href="#" class="card-link btn btn-outline-dark" role="button">Edit</a>
-                <a href="#" class="card-link btn btn-outline-danger" role="button">Delete</a>
-            </div>
-        </div>
-
-        <div class="card">
-            <img class="card-img-top" src="https://images.unsplash.com/photo-1451903978882-b165bd94e45d?w=1050&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D" alt="Card image cap 3">
-            <div class="card-body">
-                <h4 class="card-title card-deck-style">Destination</h4>
-                <p class="card-text card-deck-style">Location</p>
-                <p class="card-text lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
-                <a href="#" class="card-link btn btn-outline-dark" role="button">Edit</a>
-                <a href="#" class="card-link btn btn-outline-danger" role="button">Delete</a>
-            </div>
-        </div>
+        <!-- </div> -->
+        {% endfor %}
     </div>
 </div>
-{% endfor %}
+
 
 <!-- <div class="container-fluid card-container">
     <div class="card-deck">

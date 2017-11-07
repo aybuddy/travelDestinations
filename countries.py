@@ -270,7 +270,7 @@ def newCountry():
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
-        newCountry = Country(name=request.form['name'], user_id=login_session['user_id'])   
+        newCountry = Country(name=request.form['name'], image=request.form['image'], user_id=login_session['user_id'])   
         session.add(newCountry)
         flash('New Country %s Successfully Created' % newCountry.name)
         session.commit()
@@ -332,7 +332,7 @@ def newDestination(country_id):
     if login_session['user_id'] != country.user_id:
         return "<script>funtion myFunction() {alert('You are not authorized to add a destination to this country. Please create your own country to add a destination.');}</script><body onload='myFunction()'"
     if request.method == 'POST':
-        newDestination = Destination(name=request.form['name'], location=request.form['location'], description=request.form['description'], country_id=country_id, user_id=country.user_id)        
+        newDestination = Destination(name=request.form['name'], location=request.form['location'], description=request.form['description'], image=request.form['image'], country_id=country_id, user_id=country.user_id)        
         session.add(newDestination)
         session.commit()
         flash('New Destination %s Successfully Created' % (newDestination.name))

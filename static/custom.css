@@ -154,6 +154,15 @@ body {
     text-align: center;
 }
 
+.card {
+    min-width: 400px;
+}
+
+.card-image-width {
+    width: 200px;
+    height: 200px;
+}
+
 /* Form */
 .form-style {
     margin: 0 auto;
