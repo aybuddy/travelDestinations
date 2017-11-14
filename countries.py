@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, redirect,
-url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect
+from flask import url_for, flash, jsonify
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup1 import Base, Country, Destination, User
@@ -272,7 +272,7 @@ def fbdisconnect():
     facebook_id = login_session['facebook_id']
     # The access token must me included to successfully logout
     access_token = login_session['access_token']
-    url = 'https://graph.facebook.com/%s/permissions?access_token=%s'
+    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' \
     % (facebook_id, access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
@@ -367,7 +367,7 @@ def showDestination(country_id):
     creator = getUserInfo(country.user_id)
     destinations = session.query(Destination).filter_by(
         country_id=country_id).all()
-    if 'username' not in login_session or creator.id
+    if 'username' not in login_session or creator.id \
     != login_session['user_id']:
         return render_template('publicdestination.html',
                                destinations=destinations,
@@ -479,7 +479,7 @@ def deleteDestination(country_id, destination_id):
 def disconnect():
     if 'provider' in login_session:
         if login_session['provider'] == 'google':
-            gdisconnect()
+            # gdisconnect()
             del login_session['access_token']
             del login_session['gplus_id']
         if login_session['provider'] == 'facebook':
