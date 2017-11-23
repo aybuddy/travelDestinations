@@ -37,7 +37,7 @@ class Destination(Base):
     location = Column(String(250))
     description = Column(String(250)) 
     country_id = Column(Integer, ForeignKey('country.id'))
-    country = relationship(Country)
+    country = relationship(Country, cascade="all, delete-orphan", single_parent="True")
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
     image = Column(String(250))

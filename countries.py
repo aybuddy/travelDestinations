@@ -37,6 +37,16 @@ def showLogin():
 # gConnect
 
 
+# login decorator
+def login_required(f):
+    # @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in login_session:
+            return redirect(url_for('showLogin', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # validate state token
@@ -296,10 +306,9 @@ def showCountries():
 # add new countries
 
 
+@login_required
 @app.route('/country/new', methods=['GET', 'POST'])
 def newCountry():
-    if 'username' not in login_session:
-        return redirect('/login')
     if request.method == 'POST':
         newCountry = Country(name=request.form['name'],
                              image=request.form['image'],
@@ -314,10 +323,9 @@ def newCountry():
 # edit countries
 
 
+@login_required
 @app.route('/country/<int:country_id>/edit', methods=['GET', 'POST'])
 def editCountry(country_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     editedCountry = session.query(Country).filter_by(id=country_id).one()
     if editedCountry.user_id != login_session['user_id']:
         return "<script>function myFunction() \
@@ -336,10 +344,9 @@ def editCountry(country_id):
 # delete countries
 
 
+@login_required
 @app.route('/country/<int:country_id>/delete', methods=['GET', 'POST'])
 def deleteCountry(country_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     countryToDelete = session.query(Country).filter_by(id=country_id).one()
     if countryToDelete.user_id != login_session['user_id']:
         return "<script>function myFunction(){alert('You are \
@@ -381,11 +388,11 @@ def showDestination(country_id):
 # add new destination
 
 
+@login_required
 @app.route('/country/<int:country_id>/destination/new',
            methods=['GET', 'POST'])
 def newDestination(country_id):
-    if 'username' not in login_session:
-        return redirect('/login')
+
     country = session.query(Country).filter_by(id=country_id).one()
     if login_session['user_id'] != country.user_id:
         return "<script>funtion myFunction(){alert('You are \
@@ -412,11 +419,10 @@ def newDestination(country_id):
 # edit destination
 
 
+@login_required
 @app.route('/country/<int:country_id>/destination/<int:destination_id>/edit',
            methods=['GET', 'POST'])
 def editDestination(country_id, destination_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     editedDestination = session.query(Destination).filter_by(
         id=destination_id).one()
     country = session.query(Country).filter_by(id=country_id).one()
@@ -446,11 +452,10 @@ def editDestination(country_id, destination_id):
 # delete destination
 
 
+@login_required
 @app.route('/country/<int:country_id>/destination/<int:destination_id>/delete',
            methods=['GET', 'POST'])
 def deleteDestination(country_id, destination_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     country = session.query(Country).filter_by(id=country_id).one()
     # print "~~~**country: ", country
     destinationToDelete = session.query(Destination).filter_by(
