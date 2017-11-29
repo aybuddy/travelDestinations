@@ -2,4 +2,3 @@ __pycache__
 *.pyc
 .vagrant
 configs.js
-fb_client_secrets.json

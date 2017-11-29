@@ -34,19 +34,8 @@ def showLogin():
     login_session['state'] = state
     return render_template('login.html', STATE=state)
 
+
 # gConnect
-
-
-# login decorator
-def login_required(f):
-    # @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'username' not in login_session:
-            return redirect(url_for('showLogin', next=request.url))
-        return f(*args, **kwargs)
-    return decorated_function
-
-
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # validate state token
@@ -215,26 +204,27 @@ def fbconnect():
     access_token = request.data
     print "access token received %s " % access_token
 
-    app_id = json.loads(open('fb_client_secrets.json', 'r').read())[
-        'web']['app_id']
-    app_secret = json.loads(
-        open('fb_client_secrets.json', 'r').read())['web']['app_secret']
-    url = 'https://graph.facebook.com/oauth/access_token \
-    ?grant_type=fb_exchange_token&client_id=%s \
-    &client_secret=%s&fb_exchange_token=%s' % (
-        app_id, app_secret, access_token)
-    h = httplib2.Http()
-    result = h.request(url, 'GET')[1]
+    app_id = json.loads(open('fb_client_secrets.json', 'r').read())
+    ['web']['app_id']
+    app_secret = json.loads(open('fb_client_secrets.json', 'r').read())
+    ['web']['app_secret']
+    url = ('https://graph.facebook.com/v2.11/oauth/access_token?grant_type= \
+    fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s') \
+        % (app_id, app_secret, access_token)
+    http = httplib2.Http()
+    result = http.request(url, 'GET')[1]
+    data = json.loads(result)
     # Use token to get user info from API
-    userinfo_url = "https://graph.facebook.com/v2.10/me"
-    token = result.split(',')[0].split(':')[1].replace('"', '')
+    userinfo_url = "https://graph.facebook.com/v2.11/me"
+    # token = result.split(',')[0].split(':')[1].replace('"', '')
+    token = data['access_token']
 
-    url = 'https://graph.facebook.com/v2.10/me?access_token \
-    =%s&fields=name,id,email' % token
-    h = httplib2.Http()
-    result = h.request(url, 'GET')[1]
+    url = 'https://graph.facebook.com/v2.11/me?access_token= \
+    %s&fields=name,id,email' % token
+    http = httplib2.Http()
+    result = http.request(url, 'GET')[1]
     # print "url sent for API access:%s"% url
-    # print "API JSON result: %s" % result
+    print "API JSON result: %s" % result
     data = json.loads(result)
     login_session['provider'] = 'facebook'
     login_session['username'] = data["name"]
@@ -245,10 +235,10 @@ def fbconnect():
     login_session['access_token'] = token
 
     # Get user picture
-    url = 'https://graph.facebook.com/v2.10/me/picture?access_token \
-    =%s&redirect=0&height=200&width=200' % token
-    h = httplib2.Http()
-    result = h.request(url, 'GET')[1]
+    url = 'https://graph.facebook.com/v2.11/me/picture?access_token= \
+    %s&redirect=0&height=200&width=200' % token
+    http = httplib2.Http()
+    result = http.request(url, 'GET')[1]
     data = json.loads(result)
 
     login_session['picture'] = data["data"]["url"]
@@ -283,9 +273,9 @@ def fbdisconnect():
     # The access token must me included to successfully logout
     access_token = login_session['access_token']
     url = 'https://graph.facebook.com/%s/permissions?access_token=%s' \
-    % (facebook_id, access_token)
-    h = httplib2.Http()
-    result = h.request(url, 'DELETE')[1]
+        % (facebook_id, access_token)
+    http = httplib2.Http()
+    result = http.request(url, 'DELETE')[1]
     return "you have been logged out"
 
 # show countries
@@ -306,9 +296,11 @@ def showCountries():
 # add new countries
 
 
-@login_required
 @app.route('/country/new', methods=['GET', 'POST'])
+# @login_required
 def newCountry():
+    if 'username' not in login_session:
+        return redirect('/login')
     if request.method == 'POST':
         newCountry = Country(name=request.form['name'],
                              image=request.form['image'],
@@ -323,9 +315,11 @@ def newCountry():
 # edit countries
 
 
-@login_required
 @app.route('/country/<int:country_id>/edit', methods=['GET', 'POST'])
+# @login_required
 def editCountry(country_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     editedCountry = session.query(Country).filter_by(id=country_id).one()
     if editedCountry.user_id != login_session['user_id']:
         return "<script>function myFunction() \
@@ -344,9 +338,11 @@ def editCountry(country_id):
 # delete countries
 
 
-@login_required
 @app.route('/country/<int:country_id>/delete', methods=['GET', 'POST'])
+# @login_required
 def deleteCountry(country_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     countryToDelete = session.query(Country).filter_by(id=country_id).one()
     if countryToDelete.user_id != login_session['user_id']:
         return "<script>function myFunction(){alert('You are \
@@ -375,7 +371,7 @@ def showDestination(country_id):
     destinations = session.query(Destination).filter_by(
         country_id=country_id).all()
     if 'username' not in login_session or creator.id \
-    != login_session['user_id']:
+            != login_session['user_id']:
         return render_template('publicdestination.html',
                                destinations=destinations,
                                country=country,
@@ -388,11 +384,12 @@ def showDestination(country_id):
 # add new destination
 
 
-@login_required
 @app.route('/country/<int:country_id>/destination/new',
            methods=['GET', 'POST'])
+# @login_required
 def newDestination(country_id):
-
+    if 'username' not in login_session:
+        return redirect('/login')
     country = session.query(Country).filter_by(id=country_id).one()
     if login_session['user_id'] != country.user_id:
         return "<script>funtion myFunction(){alert('You are \
@@ -419,10 +416,12 @@ def newDestination(country_id):
 # edit destination
 
 
-@login_required
 @app.route('/country/<int:country_id>/destination/<int:destination_id>/edit',
            methods=['GET', 'POST'])
+# @login_required
 def editDestination(country_id, destination_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     editedDestination = session.query(Destination).filter_by(
         id=destination_id).one()
     country = session.query(Country).filter_by(id=country_id).one()
@@ -452,10 +451,12 @@ def editDestination(country_id, destination_id):
 # delete destination
 
 
-@login_required
 @app.route('/country/<int:country_id>/destination/<int:destination_id>/delete',
            methods=['GET', 'POST'])
+# @login_required
 def deleteDestination(country_id, destination_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     country = session.query(Country).filter_by(id=country_id).one()
     # print "~~~**country: ", country
     destinationToDelete = session.query(Destination).filter_by(
